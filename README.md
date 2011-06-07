@@ -7,3 +7,5 @@ This version fixes some bugs, employs different design choices, and adds a few f
  * the user's home directory is now autodetected
  * Labels are now unclickable `separators` instead of `items`
  * shows groups of nested keybinds (chain key) as separate and indented blocks with their own header.
+
+<img src="https://github.com/drfloob/show_ob_keybindings.py/raw/master/screenshot.jpg" width="618" alt="Screenshot" />

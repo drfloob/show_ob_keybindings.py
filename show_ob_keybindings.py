@@ -38,6 +38,8 @@ from xml.sax.handler import feature_namespaces
 
 NESTSTR = '--- '
 RCFILE = '~/.config/openbox/rc.xml'
+CHAIN_KEY_LABEL = 'Chain Key: '
+JUSTIFY_SIZE = 100
 
 class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from saxutils.DefaultHandler
     def __init__(self): # constructor 
@@ -69,14 +71,15 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
 
             # handles the case where the keybind is just a modifier key
             #   usecase: chain key is 'Super_L'
+            self.keybind_string = CHAIN_KEY_LABEL
             if (self.keybind == 'Super_L'):
-                self.keybind_string = 'Windows'
+                self.keybind_string += 'Windows'
             elif (self.keybind == 'A'):
-                self.keybind_string = 'Alt'
+                self.keybind_string += 'Alt'
             elif (self.keybind == 'S'):
-                self.keybind_string = 'Shift'
+                self.keybind_string += 'Shift'
             elif (self.keybind == 'C'):
-                self.keybind_string = 'Ctrl'
+                self.keybind_string += 'Ctrl'
             else:
                 self.keybind_string = self.keybind
 
@@ -116,7 +119,7 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
     def print_item(self, type='item'):
         label = self.keybind_string 
         if (self.command != ''):
-            label = (NESTSTR * self.nesting_level) + label + rjust(strip(self.command),100)
+            label = (NESTSTR * self.nesting_level) + label + rjust(strip(self.command), JUSTIFY_SIZE)
 
         print '<' + type + '  label="' + label + \
                     '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</' + type + '>'
