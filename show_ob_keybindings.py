@@ -23,6 +23,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from os.path import expanduser
 import xml.parsers.expat
 from string import strip, replace, rjust
 from xml.sax import make_parser
@@ -39,7 +40,7 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
         self.action = ''
         self.command = ''
         # following line needs to be set to point the xml file containing your openbox keybindings
-        self.rcfile = '/home/joe/.config/openbox/rc.xml'
+        self.rcfile = '~/.config/openbox/rc.xml'
         
     # this function should return a string containing the command you want to run for the current keybinding        
     def editCommand(self): 
@@ -101,6 +102,6 @@ if __name__ == '__main__':
     print '<?xml version="1.0" encoding="UTF-8"?>' # header
     print '<openbox_pipe_menu>' # main pipe menu element
     print '<separator label="Select a keybinding to edit it" />'
-    parser.parse(dh.rcfile) # parse the rc.xml file
+    parser.parse(expanduser(dh.rcfile)) # parse the rc.xml file
     print '</openbox_pipe_menu>\n' # end pipe menu element
 
