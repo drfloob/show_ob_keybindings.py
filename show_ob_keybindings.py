@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 # OpenBox pipe menu to show currently defined openbox keybindings, and edit them.
 #
-# Copyright 2010 Joe Bloggs (vapniks@yahoo.com)
+# modified by aj heller <aj@drfloob.com>, june 2011
+# license: GPLv3
+# source can be found on github: https://github.com/drfloob/show_ob_keybindings.py
 #
-# IMPORTANT: you need to change the rcfile member variable to point to the xml file containing
+# IMPORTANT: you need to change the RCFILE global variable to point to the xml file containing
 # your openbox keybindings.
+# 
 # Also, the default editor is set to emacsclient. If you want to use a different editor you need to
 # change the editCommand function below.
 #
+#
+# Original Copyright:
+# Copyright 2010 Joe Bloggs (vapniks@yahoo.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
