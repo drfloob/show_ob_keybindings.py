@@ -51,6 +51,19 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
         if name == 'keybind':
             self.in_keybind = 1
             self.keybind = attrs.get('key',None) # Get the keybinding
+
+            # handles the case where the keybind is just a modifier key
+            #   usecase: chain key is 'W'
+            if (self.keybind == 'Windows'):
+                self.keybind_string = 'Windows'
+            if (self.keybind == 'A'):
+                self.keybind_string = 'Alt'
+            if (self.keybind == 'S'):
+                self.keybind_string = 'Shift'
+            if (self.keybind == 'C'):
+                self.keybind_string = 'Ctrl'
+
+            # handles the case where a modifier key is used in combination
             self.keybind_string = replace(self.keybind,'C-','Ctrl+')
             self.keybind_string = replace(self.keybind_string,'W-','Windows+')
             self.keybind_string = replace(self.keybind_string,'S-','Shift+')
