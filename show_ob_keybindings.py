@@ -100,7 +100,7 @@ if __name__ == '__main__':
     parser.setContentHandler(dh) # tell the parser to use our document handler
     print '<?xml version="1.0" encoding="UTF-8"?>' # header
     print '<openbox_pipe_menu>' # main pipe menu element
-    print '<item label="Select a keybinding to edit it"></item>'
+    print '<separator label="Select a keybinding to edit it" />'
     parser.parse(dh.rcfile) # parse the rc.xml file
     print '</openbox_pipe_menu>\n' # end pipe menu element
 
