@@ -30,6 +30,9 @@ from xml.sax import make_parser
 from xml.sax import saxutils
 from xml.sax.handler import feature_namespaces
 
+NESTSTR = '--- '
+RCFILE = '~/.config/openbox/rc.xml'
+
 class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from saxutils.DefaultHandler
     def __init__(self): # constructor 
         self.in_keybind = 0
@@ -40,59 +43,81 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
         self.action = ''
         self.command = ''
         # following line needs to be set to point the xml file containing your openbox keybindings
-        self.rcfile = '~/.config/openbox/rc.xml'
+        self.nesting_level = 0
         
     # this function should return a string containing the command you want to run for the current keybinding        
     def editCommand(self): 
-        return 'emacsclient -a emacs -e \'(progn (find-file "' + self.rcfile + '") ' + \
+        return 'emacsclient -a emacs -e \'(progn (find-file "' + RCFILE + '") ' + \
             '(goto-char (point-min)) (re-search-forward "\\\"' + self.keybind + '\\\""))\''
         
     # override function from DefaultHandler, called at start of xml element
     def startElement(self, name, attrs): 
+        if (name == 'keybind') and (self.in_keybind == 1):
+            # chain key has a child! print a tag for it
+            self.print_item('separator')
+
         if name == 'keybind':
+            self.nesting_level += 1
             self.in_keybind = 1
             self.keybind = attrs.get('key',None) # Get the keybinding
 
             # handles the case where the keybind is just a modifier key
-            #   usecase: chain key is 'W'
-            if (self.keybind == 'Windows'):
+            #   usecase: chain key is 'Super_L'
+            if (self.keybind == 'Super_L'):
                 self.keybind_string = 'Windows'
-            if (self.keybind == 'A'):
+            elif (self.keybind == 'A'):
                 self.keybind_string = 'Alt'
-            if (self.keybind == 'S'):
+            elif (self.keybind == 'S'):
                 self.keybind_string = 'Shift'
-            if (self.keybind == 'C'):
+            elif (self.keybind == 'C'):
                 self.keybind_string = 'Ctrl'
+            else:
+                self.keybind_string = self.keybind
 
             # handles the case where a modifier key is used in combination
-            self.keybind_string = replace(self.keybind,'C-','Ctrl+')
+            self.keybind_string = replace(self.keybind_string,'C-','Ctrl+')
             self.keybind_string = replace(self.keybind_string,'W-','Windows+')
             self.keybind_string = replace(self.keybind_string,'S-','Shift+')
             self.keybind_string = replace(self.keybind_string,'A-','Alt+')
         elif (name == 'action') and (self.in_keybind == 1):
             self.in_action = 1
-            self.action = attrs.get('name', None)
-        elif (name == 'command') and (self.in_action == 1) and (self.action == 'Execute'):
-            self.command = ''
-            self.in_command = 1
+            self.command = attrs.get('name', None)
+        #elif (name == 'command'): #and (self.in_action == 1) and (self.action == 'Execute'):
+        #    self.command = ''
+        #    self.in_command = 1
 
     # override function from DefaultHandler, called at end of xml element            
     def endElement(self, name):
         if name == 'keybind':
+            self.nesting_level -= 1
+
+            if (self.keybind_string != ''):
+                self.print_item()
+            else:
+                self.print_separator()
+
             self.in_keybind = 0
             self.in_action = 0
-            if self.in_command == 1: # you may want to alter the justification in following print lines
-                print '<item label="' + self.keybind_string + rjust(strip(self.command),100) + \
-                    '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</item>'
-                self.in_command = 0
-            else:
-                print '<item label="' + self.keybind_string + rjust(self.action,100) + \
-                    '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</item>'
+            self.in_command = 0
+            self.command = ''
+            self.keybind_string = ''
 
     # override function from DefaultHandler, called as each character outside an xml tag is read
     def characters(self,ch):
         if self.in_command:
             self.command = self.command + ch
+
+    def print_item(self, type='item'):
+        label = self.keybind_string 
+        if (self.command != ''):
+            label = (NESTSTR * self.nesting_level) + label + rjust(strip(self.command),100)
+
+        print '<' + type + '  label="' + label + \
+                    '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</' + type + '>'
+
+    def print_separator(self):
+        print '<separator />'
+
             
 if __name__ == '__main__':
     parser = make_parser() # create a parser
@@ -102,6 +127,6 @@ if __name__ == '__main__':
     print '<?xml version="1.0" encoding="UTF-8"?>' # header
     print '<openbox_pipe_menu>' # main pipe menu element
     print '<separator label="Select a keybinding to edit it" />'
-    parser.parse(expanduser(dh.rcfile)) # parse the rc.xml file
+    parser.parse(expanduser(RCFILE)) # parse the rc.xml file
     print '</openbox_pipe_menu>\n' # end pipe menu element
 
