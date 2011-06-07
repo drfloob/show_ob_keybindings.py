@@ -35,7 +35,7 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
         self.in_action = 0
         self.in_command = 0
         self.keybind = ''
-        self.keybind2 = ''
+        self.keybind_string = ''
         self.action = ''
         self.command = ''
         # following line needs to be set to point the xml file containing your openbox keybindings
@@ -51,10 +51,10 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
         if name == 'keybind':
             self.in_keybind = 1
             self.keybind = attrs.get('key',None) # Get the keybinding
-            self.keybind2 = replace(self.keybind,'C-','Ctrl+')
-            self.keybind2 = replace(self.keybind2,'W-','Windows+')
-            self.keybind2 = replace(self.keybind2,'S-','Shift+')
-            self.keybind2 = replace(self.keybind2,'A-','Alt+')
+            self.keybind_string = replace(self.keybind,'C-','Ctrl+')
+            self.keybind_string = replace(self.keybind_string,'W-','Windows+')
+            self.keybind_string = replace(self.keybind_string,'S-','Shift+')
+            self.keybind_string = replace(self.keybind_string,'A-','Alt+')
         elif (name == 'action') and (self.in_keybind == 1):
             self.in_action = 1
             self.action = attrs.get('name', None)
@@ -68,11 +68,11 @@ class rcHandler(saxutils.handler.ContentHandler): # handler class inherits from 
             self.in_keybind = 0
             self.in_action = 0
             if self.in_command == 1: # you may want to alter the justification in following print lines
-                print '<item label="' + self.keybind2 + rjust(strip(self.command),100) + \
+                print '<item label="' + self.keybind_string + rjust(strip(self.command),100) + \
                     '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</item>'
                 self.in_command = 0
             else:
-                print '<item label="' + self.keybind2 + rjust(self.action,100) + \
+                print '<item label="' + self.keybind_string + rjust(self.action,100) + \
                     '">\n<action name="execute"><execute>' + self.editCommand() + '</execute></action>\n</item>'
 
     # override function from DefaultHandler, called as each character outside an xml tag is read
